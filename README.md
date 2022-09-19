@@ -1,5 +1,7 @@
 > “Everything is an object. However, objects aren't everything.” <br> &ndash; perl11/potion
 
+> “I'd rather write code than papers.” <br> &ndash; Guido van Rossum
+
 ## Introduction
 
 Adast Maxima MS80 is a paper cutting machine (guillotine) produced in Czechoslovakia in 1980s, still in operation in Vilnius, Lithuania, 2022.
@@ -120,6 +122,8 @@ The code is written for the [ATmega16][4] microcontroller and the avr-gcc compil
 - [rotary-encoder][2]
 - [vytassblog][3]
 - [ATmega16][4]
+- [A Tutorial on Portable Makefiles](https://nullprogram.com/blog/2017/08/20/)
+- [Hacker News](https://news.ycombinator.com/item?id=32303193)
 
 [1]: https://www.en.chip-elektronika.pl/readers-programmers-for-paper-cutters/control-system-pd-04/
 [2]: https://howtomechatronics.com/tutorials/arduino/rotary-encoder-works-use-arduino/
