@@ -2,6 +2,8 @@
 
 > “I'd rather write code than papers.” <br> &ndash; Guido van Rossum
 
+> “I just want to model what’s going on in the real world.” <br> &ndash; Joe Armstrong
+
 ## Introduction
 
 Adast Maxima MS80 is a paper cutting machine (guillotine) produced in Czechoslovakia in 1980s, still in operation in Vilnius, Lithuania, 2022.
