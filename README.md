@@ -1,7 +1,8 @@
+> “Everything is an object. However, objects aren't everything.” <br> &ndash; perl11/potion
 
 ## Introduction
 
-Adast Maxima MS80 is a paper cutting machine (guillotine) produced in Czechoslovakia in 1980s, still in operation in Vilnius, Lithuania, 2021.
+Adast Maxima MS80 is a paper cutting machine (guillotine) produced in Czechoslovakia in 1980s, still in operation in Vilnius, Lithuania, 2022.
 
 <table>
 <tr>
@@ -14,9 +15,9 @@ Adast Maxima MS80 is a paper cutting machine (guillotine) produced in Czechoslov
 </tr>
 </table>
 
-Its repairing was executed jointly by me and Saulius Rakauskas in about one week in February 2020. He disassembled the machine, designed a new circuit board, did all the soldering and hardware testing. I wrote the C program for the ATmega16 microcontroller with which we replaced the original Tesla chipset. 
+The repair was executed jointly by me and Saulius Rakauskas in about one week in February 2020. He disassembled the machine, designed a new circuit board, did all the soldering and hardware testing. I wrote the C program for the ATmega16 microcontroller with which we replaced the original Tesla chipset. 
 
-The machine still does the job even now (the end of 2021), but there remain further challenges. The initial distance synchronization is more manual than it should be, the machine loses the distance precision in time and needs restarts.
+The machine still does the job even now (the end of 2022), but it is at the end of its life line due to worn mechanics. The initial distance synchronization is more manual than it should be, the machine loses the distance precision in time and needs restarts.
 
 <table>
 <tr>
@@ -54,7 +55,7 @@ An accident due to the electric current overload in the factory burnt the main c
 
 The board microcontroller did not survive, so essentially the process became that of making a new circuit board from the bits and pieces of knowledge that were salvaged. The exact operating regimes and work flows became lost, but the main functionality, cutting the paper, was retained.
 
-Remarkably, there exists the third party solution designed to tackle exactly this very specific problem, see i.e. [PD-04][1] which provides the microcontroller based circuit board with the program designed for the paper cutting machines. We decided that the PD-04 encoder is not a good match for this specific guillotine.
+Remarkably, there exists third party solutions designed to tackle this very specific problem, see i.e. [PD-04][1] which provides a microcontroller based circuit board with the program designed for the paper cutting machines. We decided that the PD-04 encoder is not a good match for this specific guillotine.
 
 ## Results
 
@@ -65,7 +66,7 @@ In essence, the machine operation breaks into the three stages:
 2. The machine repositions its guillotine.
 3. The operator triggers the cutting.
 
-There are a few other modes, but they are not essential to the understanding of this machine. The position is sensed via the rotary encoder which, along with the guillotine, is shown in the photos below. The fourth picture shows a certain disk-like handle used to manually exit the emergency situations (e.g. to lift the guillotine up if it gets stuck during the cutting as the electricity disappears).
+There are a few other modes, but they are not essential. The position is sensed via a rotary encoder which, along with the guillotine, is shown in the photos below. The fourth picture shows a certain disk-like handle used to manually exit the emergency situations (e.g. to lift the guillotine up if it gets stuck during the cutting as the electricity disappears).
 
 <table>
 <tr>
