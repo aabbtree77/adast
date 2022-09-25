@@ -21,7 +21,7 @@ Adast Maxima MS80 is a paper cutting machine (guillotine) produced in Czechoslov
 
 The repair was executed jointly by me and Saulius Rakauskas in about one week in February 2020. He disassembled the machine, designed a new circuit board, did all the soldering and hardware testing. I wrote the C program for the ATmega16 microcontroller with which we replaced the original Tesla chipset. 
 
-The machine still does the job even now (the end of 2022), but it is at the end of its life line due to worn mechanics. The initial distance synchronization is more manual than it should be, the machine loses the distance precision in time and needs restarts.
+The machine still does the job even now (the end of 2022), but it is at the end of its life line due to worn mechanics.
 
 <table>
 <tr>
@@ -57,15 +57,14 @@ An accident due to the electric current overload in the factory burnt the main c
 </tr>
 </table>
 
-The board microcontroller did not survive, so essentially the process became that of making a new circuit board from the bits and pieces of knowledge that were salvaged. The exact operating regimes and work flows became lost, but the main functionality, cutting the paper, was retained.
+The microcontroller did not survive, so we had to make a new circuit board from what was salvaged. The exact operating regimes and work flows became lost, but the main functionality, cutting the paper, was retained.
 
-Remarkably, there exists third party solutions designed to tackle this very specific problem, see i.e. [PD-04][1] which provides a microcontroller based circuit board with the program designed for the paper cutting machines. We decided that the PD-04 encoder is not a good match for this specific guillotine.
+Remarkably, there exists third party solutions designed to tackle this very specific problem, see i.e. [PD-04][1] which provides a microcontroller based circuit board with the program designed for paper cutting machines. The PD-04 system is expensive and thus can be a risky investment for such very old machines.
 
 ## Results
 
-It is not possible to describe everything precisely here, all the differences between the original design and what we have implemented. I will only sketch up the project, vaguely.
+The machine operation breaks into the three stages:
 
-In essence, the machine operation breaks into the three stages:
 1. The operator enters the distance value.
 2. The machine repositions its guillotine.
 3. The operator triggers the cutting.
@@ -116,7 +115,7 @@ The guillotine is made of a heavy steel and thus has a large stopping distance t
 
 The guillotine is old and seems to react to the motion commands with small occasional erroneous displacements that bypass the rotary encoder and accumulate in time, which eventually results in the loss of precision and the need to restart the machine.
 
-The code is written for the [ATmega16][4] microcontroller and the avr-gcc compiler. The chip has 32 IO pins which we considered plenty. This turned out to be a very tight choice. It would have been better to use a complete board with a display such as "ILS - MEGA 2560 R3 Development Board", but we wanted to match the specific digit indicators to the factory panel.
+The code is written for the [ATmega16][4] microcontroller and the avr-gcc compiler. The chip has 32 IO pins which we considered plenty. This turned out to be a very tight choice. It would have been better to apply a ready-made array of 7-segment LED indicators with a keypad, both based on the 2 wire/I2C interfaces, in order to reduce soldering effort. However, we wanted to match the board with the specific digit indicators and the factory panel.
 
 ## References
 
