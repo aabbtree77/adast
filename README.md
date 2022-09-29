@@ -2,8 +2,8 @@
 
 ## Introduction
 
-Have you ever thought about the discrepancy between a colourful Christmas/toy/souvenir carton box and the actual equipment/steel industry that produces it?
-Some of these machines weigh 3000 kg...
+There is quite a discrepancy between a colourful Christmas carton box and the tools that produce it.
+Some of these machines weigh 3000 kilograms.
 
 Adast Maxima MS80 is a paper cutting machine (guillotine) produced in Czechoslovakia in 1980s, still in operation in Vilnius, Lithuania, 2022.
 
