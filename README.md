@@ -58,7 +58,7 @@ An accident due to the electric current overload in the factory burnt the main c
 
 The microcontroller did not survive, so we had to make a new circuit board from what was salvaged. The exact operating regimes and work flows became lost, but the main functionality, cutting the paper, was retained.
 
-Remarkably, there exists third party solutions designed to tackle this very specific problem, see i.e. [PD-04][1] which provides a microcontroller based circuit board with the program designed for paper cutting machines. The PD-04 system is expensive and thus can be a risky investment for such very old machines.
+Remarkably, there exists a commercial solution/middleware designed to tackle this very specific problem, see i.e. [PD-04][1] which provides a microcontroller based circuit board with the program designed for paper cutting machines. The PD-04 system is expensive though.
 
 ## Results
 
@@ -112,7 +112,7 @@ The initial distance synchronization deserves a few words. At first, the guillot
 
 The guillotine is made of a heavy steel and thus has a large stopping distance that it still travels once the movement is signalled to stop. This stopping distance is measured to be constant, about 2100 microns when stopping by going in the forward direction, and 2400 microns when stopping backwards. It is doubtful that these values remain constant, but their precise knowledge is not critical as long as the rotary encoder senses (counts) every guillotine movement.
 
-The guillotine is old and seems to react to the motion commands with small occasional erroneous displacements that bypass the rotary encoder and accumulate in time, which eventually results in the loss of precision and the need to restart the machine.
+The worst part is that it seems to react to the motion commands with small occasional erroneous displacements that bypass the rotary encoder and accumulate in time, which eventually results in the loss of precision and the need to restart the machine.
 
 The code is written for the [ATmega16][4] microcontroller and the avr-gcc compiler. The chip has 32 IO pins which we considered plenty. This turned out to be a very tight choice. It would have been better to apply a ready-made array of 7-segment LED indicators with a keypad, both based on the 2 wire/I2C interfaces, in order to reduce soldering effort. However, we wanted to match the board with the specific digit indicators and the factory panel.
 
