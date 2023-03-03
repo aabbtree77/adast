@@ -1,11 +1,7 @@
-> “Everything is an object. However, objects aren't everything.” <br> &ndash; perl11/potion
 
 ## Introduction
 
-There is quite a discrepancy between a colourful Christmas carton box and the tools that produce it.
-Some of these machines weigh 3000 kilograms.
-
-Adast Maxima MS80 is a paper cutting machine (guillotine) produced in Czechoslovakia in 1980s, still in operation in Vilnius, Lithuania, 2022.
+Adast Maxima MS80 is a paper (paperboard) cutting machine (guillotine) produced in Czechoslovakia in 1980s, still in operation in Vilnius, Lithuania, 2022.
 
 <table>
 <tr>
@@ -56,9 +52,9 @@ An accident due to the electric current overload in the factory burnt the main c
 </tr>
 </table>
 
-The microcontroller did not survive, so we had to make a new circuit board from what was salvaged. The exact operating regimes and work flows became lost, but the main functionality, cutting the paper, was retained.
+The microcontroller did not survive, so we had to make a new circuit board from what was salvaged. The exact operating regimes and work flows were lost, but the main functionality, cutting the paper, was retained.
 
-Remarkably, there exists a commercial solution/middleware designed to tackle this very specific problem, see i.e. [PD-04][1] which provides a microcontroller based circuit board with the program designed for paper cutting machines. The PD-04 system is expensive though.
+Remarkably, there exists a commercial solution/middleware designed to tackle this very specific problem, see i.e. [PD-04][1] which provides a microcontroller based circuit board with the program designed for paper cutting machines. The PD-04 system is expensive though ([around 1325 euro](https://www.en.chip-elektronika.pl/readers-programmers-for-paper-cutters/control-system-pd-04/)).
 
 ## Results
 
@@ -108,7 +104,7 @@ There are a few other modes, but they are not essential. The position is sensed 
 </tr>
 </table>
 
-The initial distance synchronization deserves a few words. At first, the guillotine's position is unknown and it is located where it has been left when the machine has been switched off the last time. There is no distance value to read from the permanent memory, nor such a method would be viable. All we know is that (i) the guillotine is somewhere in between the starting marker (approx. 20mm) and the end wall (approx. 810mm), (ii) there is a sensor located at the 225mm from the starting marker, and (iii) we hit the precise location of the guillotine only when it passes the sensor from one specific direction, i.e. from the starting position towards the end (a movement from the opposite direction also activates the sensor signal, but it yields a less precise value).
+The initial distance synchronization deserves a few words. At first, the guillotine's position is unknown and it is located where it has been left when the machine has been switched off. There is no distance value to read from the permanent memory, nor such a method would be viable. All we know is that (i) the guillotine is somewhere in between the starting marker (approx. 20mm) and the end wall (approx. 810mm), (ii) there is a sensor located at the 225mm from the starting marker, and (iii) we hit the precise location of the guillotine only when it passes the sensor from one specific direction, i.e. from the starting position towards the end (a movement from the opposite direction also activates the sensor signal, but it yields a less precise value).
 
 The guillotine is made of a heavy steel and thus has a large stopping distance that it still travels once the movement is signalled to stop. This stopping distance is measured to be constant, about 2100 microns when stopping by going in the forward direction, and 2400 microns when stopping backwards. It is doubtful that these values remain constant, but their precise knowledge is not critical as long as the rotary encoder senses (counts) every guillotine movement.
 
