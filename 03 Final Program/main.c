@@ -1,7 +1,4 @@
-/* Adast Maxima MS80 control program
-   (C) Copyright Ramunas Girdziusas
-   Released under the MIT licence, Feb 4th, 2020
-*/
+/*** atmega32, R. G. May 9th, 2023 ***/
 
 #define F_CPU 8000000UL  
 #include <avr/io.h>
@@ -22,7 +19,7 @@
 #define TOGGLE(pin)         _TOGGLE(PORT,pin)    
 #define READ(pin)           _GET(PIN,pin)
 
-//IO
+// IO
 
 // active 1:
 #define Seg_ctrl0 A,0	 
@@ -30,17 +27,17 @@
 #define Seg_ctrl2 A,2
 #define Seg_ctrl3 A,3
 
-//active 0:	
+// active 0:	
 #define Seg_0 A,7	
 #define Seg_1 A,6		
 #define Seg_2 A,5
 #define Seg_3 A,4	 
 
-//active 1:
+// active 1:
 #define Out_forw C,6
 #define Out_back C,5
 
-//Active 0:
+// active 0:
 #define In_cut_inactive D,0
 #define In_pos_2225 D,3
 #define In_forw D,6
@@ -66,28 +63,16 @@
 //uint8_t is in [0, +255].
 //int16_t is in [−32768, +32767].
 //int32_t is in [−2147483648, +2147483647].
-int32_t P_MAX_MU = ((int32_t)807000);
-int32_t P_MIN_MU = ((int32_t)28000);
-int32_t P_ST_MU = ((int32_t)223000);
+const int32_t P_MAX_MU = ((int32_t)807000);
+const int32_t P_MIN_MU = ((int32_t)28000);
+const int32_t P_ST_MU = ((int32_t)223000);
 
-//3500mu/250 steps = 14mu/step:
-int32_t P_COUNT = 0;
-int32_t P_MAX_COUNT = 0;
-int32_t P_MIN_COUNT = 0;
-int32_t P_ST_COUNT = 0;
-
-
-int32_t OFFSET_MU = ((int32_t)50000);
+const int32_t STEP_MU = ((int32_t)40);
+const int32_t OFFSET_MU = ((int32_t)0); //5000
 volatile int32_t P_MU = 0;
 volatile int32_t TARGET_MU = 0;
-volatile int32_t BREAK_DIST_FORW_MU = 500;
-volatile int32_t BREAK_DIST_BACK_MU = 2200;
-
-volatile int32_t CC_COUNT_NOW = 0;
-volatile int32_t CC_COUNT_BEFORE = 0;
-volatile int32_t CIRCLE_COUNT = 0; //3rd encode signal
-volatile int32_t CIRCLE_COUNT_AUX = 0; //3rd encode signal
-int32_t CIRCLE_MU = 3500;
+const int32_t BREAK_DIST_FORW_MU = 0; //2100
+const int32_t BREAK_DIST_BACK_MU = 0; //2400
 
 volatile uint8_t BLINK_MODE = 0;
 volatile uint8_t OVF_T1 = 0;
@@ -96,8 +81,6 @@ volatile uint8_t SYMBOL_IDS[] = {0, 0, 0, 0};
 volatile uint8_t SYMBOL_TEMP = 0;
 volatile uint8_t STEP_COUNT_MODE = 0;
 volatile uint8_t FORWARD_MODE = 0;
-volatile uint8_t FORWARD_MODE_NOW = 0;
-volatile uint8_t FORWARD_MODE_BEFORE = 0;
 volatile uint8_t TARGET_DIGIT_IND = 0;
 volatile int32_t TARGET_DIGITS[] = {0, 0, 0, 0};
 
@@ -194,90 +177,23 @@ void show_position(int32_t value_mu) {
     }
 }
 
-int32_t divide_and_round(int32_t val_big, int32_t val_small) {
-//Checked for positives only
-
-    int32_t val_mod, val_small_half, val_result;
-    val_result = val_big; 
-    val_small_half = val_small/2; 
-    val_mod = val_big % val_small;
-    if ( (val_small % 2) != 0 ) {
-        //val_small is odd
-        if (val_mod > val_small_half) { //round up
-            val_result = (val_big + val_small_half)/val_small; 
-        }  
-        if (val_mod <= val_small_half) { //round down, note lesseq op
-            val_result = val_big/val_small; 
-        }
-    } else {
-        //val_small is even   
-        if (val_mod > val_small_half) { //round up
-            val_result = (val_big + val_small_half)/val_small; 
-        }
-        if (val_mod < val_small_half) { //round down
-            val_result = val_big/val_small; 
-        }
-        if (val_mod == val_small_half) { //round up even
-            val_result = val_big/val_small;
-            if ( (val_result % 2) != 0 ) {
-                val_result++;
-            } 
-        }
-    }
-    return val_result;
-}
-
-int32_t COUNT_to_MU(int32_t val_count) {
-//Convert impulses (counts) to the distance val in mu
-
-    int32_t val_mu = 0;
-    if (CIRCLE_COUNT != 0) {
-        val_mu = divide_and_round(val_count * CIRCLE_MU, CIRCLE_COUNT);
-    }
-    return val_mu;
-}
-
-
-int32_t MU_to_COUNT(int32_t val_mu) {
-//Convert distance to the number of impulses (counts)
-
-    int32_t val_count;
-    val_count = divide_and_round(val_mu * CIRCLE_COUNT, CIRCLE_MU);
-    return val_count;
-}
-
 ISR(TIMER0_COMP_vect)
 {
     STATE_A_NOW = READ(In_encode_A);
     if (STEP_COUNT_MODE==1) {
-        if(STATE_A_NOW != STATE_A_BEFORE) {     
+        if(STATE_A_NOW < STATE_A_BEFORE) {     
             if(READ(In_encode_B) != STATE_A_NOW) {
                 FORWARD_MODE = 1; 
-                P_COUNT--; 
+                P_MU -= STEP_MU; 
             } else {
                 FORWARD_MODE = 0; 
-                P_COUNT++;
+                P_MU += STEP_MU;
             } 
         }
-        P_COUNT = (P_COUNT < P_MIN_COUNT)? P_MIN_COUNT : P_COUNT;
-        P_COUNT = (P_COUNT > P_MAX_COUNT)? P_MAX_COUNT : P_COUNT;
-        
-        P_MU = COUNT_to_MU(P_COUNT);
         P_MU = (P_MU < P_MIN_MU)? P_MIN_MU : P_MU;
         P_MU = (P_MU > P_MAX_MU)? P_MAX_MU : P_MU;
     }
     STATE_A_BEFORE = STATE_A_NOW;
-}
-
-ISR(INT0_vect)
-{
-    FORWARD_MODE_NOW = FORWARD_MODE;
-    if( (STEP_COUNT_MODE == 1) && (FORWARD_MODE_NOW == FORWARD_MODE_BEFORE)){
-        CC_COUNT_NOW = P_COUNT;
-        CIRCLE_COUNT_AUX = CC_COUNT_NOW - CC_COUNT_BEFORE;
-        CC_COUNT_BEFORE = CC_COUNT_NOW;
-    }
-    FORWARD_MODE_BEFORE = FORWARD_MODE_NOW;
 }
 
 void move_forward(void) {
@@ -285,7 +201,7 @@ void move_forward(void) {
     LOW(Out_back);
 }
 
-void move_backwards(void) {
+void move_backward(void) {
     LOW(Out_forw);
     HIGH(Out_back);
 }
@@ -337,7 +253,7 @@ void key_pressed(void) {
 }
 
 void target_setup(void) {
-//Set global TARGET_MU to user input.
+//set global TARGET_MU to user input
     
     uint8_t valid_pos = 0;
     uint8_t BLINK_MODE = 1;             
@@ -360,7 +276,7 @@ void submove_to_target(int32_t target_val) {
     
     if (diff_mu > 0) {
         while (diff_mu > 0) {
-            move_backwards();
+            move_backward();
             //If the sensor is hit, use the opportunity to resync P_MU.
             if (READ(In_pos_2225) == 0) {
                 P_MU = P_ST_MU;
@@ -390,7 +306,7 @@ void move_to_target_and_stop(int32_t target_val) {
     //100mu = 0.1 mm is the smallest allowed target dist difference
     if ( (diff_mu < -90) || (diff_mu > 90) ) {
         if (diff_mu > 0) {
-            if( (P_MAX_MU - target_val) > OFFSET_MU ) {
+            if( ((P_MAX_MU - target_val) > OFFSET_MU) &&  (OFFSET_MU > 0) ) {
                 submove_to_target(target_val + OFFSET_MU - BREAK_DIST_BACK_MU);
                  _delay_ms(1000);
                 submove_to_target(target_val + BREAK_DIST_FORW_MU);          
@@ -398,7 +314,9 @@ void move_to_target_and_stop(int32_t target_val) {
                 submove_to_target(target_val - BREAK_DIST_BACK_MU);
             }        
         } else {
-            submove_to_target(target_val + BREAK_DIST_FORW_MU);
+            if( (target_val - P_MIN_MU) > 90 ) {
+                submove_to_target(target_val + BREAK_DIST_FORW_MU);
+            }    
         }
     }
     //Otherwise exit as diff_mu is too small.
@@ -406,26 +324,16 @@ void move_to_target_and_stop(int32_t target_val) {
 
 //------------------------------------------------------------------------------
 int main(void) {
-    P_MAX_COUNT = MU_to_COUNT(P_MAX_MU);
-    P_MIN_COUNT = MU_to_COUNT(P_MIN_MU);
-    P_ST_COUNT = MU_to_COUNT(P_ST_MU);
-
-    //INT0 is to measure CIRCLE_COUNT
-    //External Interrupt Request 0 Enable
-    GICR|=(1<<INT0);
-    //The falling edge of INT0 generates an interrupt request. 
-    //Page 65 atmega16.pdf. Demands I/O clock.
-    MCUCR|=(1<<ISC01);
     
     // Timer/Counter0 CTC mode to experiment with the encode detection freq. 
     // Pages 77-80. atmega16.pdf.
     TCCR0 |= (1<<CS00); //no prescaling, leave at 8MHz
     // TCCR0 |= (1<<CS01); //prescaler 8x
     TCCR0 |= (1<<WGM01); //CTC mode
-	TCNT0 = 0; //just in case
-	TIMSK |= (1<<OCIE0); //Timer/Counter0 Output Compare Match Interrupt Enable
+	  TCNT0 = 0; //just in case
+	  TIMSK |= (1<<OCIE0); //Timer/Counter0 Output Compare Match Interrupt Enable
     TIMSK |= (1 << TOIE0); //Timer/Counter0 Overflow Interrupt Enable
-	OCR0 = 16;//between 0 to 255, 16 should bring 0.5MHz
+	  OCR0 = 16;//between 0 to 255, 16 should bring 0.5MHz
     //OCR0 = 80; //100KHz
     
     // TIMER/Counter1 for LED blinking at long (sub-second) intervals.
@@ -478,8 +386,9 @@ int main(void) {
     INPUT(In_ind8);
     INPUT(In_ind9);
  
+    show_position(111100);
     _delay_ms(2000); 
-    show_position(0);
+
        
     uint8_t found_pos2225 = 0;
     
@@ -502,22 +411,18 @@ int main(void) {
                 //First time pos_2555 is located
                 P_MU = P_ST_MU;
                 STEP_COUNT_MODE = 1;
-                _delay_us(50);
-                FORWARD_MODE_BEFORE = FORWARD_MODE;
                 found_pos2225 = 1;
-                _delay_ms(1000);
-                stop_movement();
-                CIRCLE_COUNT = CIRCLE_COUNT_AUX;
-                show_position(CIRCLE_COUNT*100);
-                _delay_ms(5000); 
+                //_delay_ms(1000);
+                //stop_movement();
+                //_delay_ms(1000); 
                 //move_to_target_and_stop(P_ST_MU); 
             } 
         } 
         stop_movement();    
         
-        //Move backwards
+        //Move backward
         while ( (READ(In_back)==0) && (READ(In_cut_inactive)!=0) ) {
-            move_backwards();
+            move_backward();
             if (found_pos2225 == 1) {
                 //If the sensor is hit, use the opportunity to resync P_MU.
                 if (READ(In_pos_2225) == 0) {
