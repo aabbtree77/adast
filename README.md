@@ -130,7 +130,7 @@ The code also resyncs the distance value whenever a knife passes the sensor. The
 
 ## Precision 
 
-The loss of precision has two sources of different nature: (i) cumulative/catastrophic precision loss, and (ii) constant bias which can be alleviated.
+The loss of precision can happen in two distinct ways: (i) as a cumulative/catastrophic precision loss, and (ii) as a constant bias which can be alleviated.
 
 The first category includes the single most critical parameter of this system, i.e. the distance traveled per encoder impulse, in microns (MPS). This value must be known precisely, otherwise the error will accumulate in time. The encoder specification states that MPS=40mu, but we do not know its deviation and whether the original system has not been corrected in code, via some precision/laser measurement which we cannot perform.
 
@@ -146,22 +146,16 @@ Therefore, we cannot determine MPS with an adequate precision by means of a mm-r
 
 The second group of errors add a constant bias to the distance value. For instance, the sensor position is known only approximately with the mm precision of a standard ruler which might introduce a mm/sub-mm bias in the real and displayed knife position. The bias is constant though, so it does not accumulate into the cascaded loss of precision with each knife movement; it can be measured and accounted for, in code. A similar case holds for the potentially imprecise stopping distance values. The only requirement/hope is that they are constant.
 
-## Remarks Regarding Project Economics
+## Additional Remarks
 
-- Repairing an MCU-based device will seldom be economically viable. We live in the replacement/wasteland economy. 
+- The machine is a technological marvel of precision mechanics, hydraulics, large electric current engineering, and the microprocessor logic.
 
-- What is hard for me to understand is why the chips are often blurred, their programs are almost never available. 
+- Repairing a microcontroller unit (MCU) based board will seldom be economically viable. 
 
-- Rewriting a microcontroller program demands rediscovering some essential portions of the original R&D, which takes time, but the benefit of scaling is lost. 
+- Rewriting a microcontroller program demands rediscovering bits of the original R&D, which takes time, but the benefit of scaling is lost. 
   The result is just one repaired device, not many of them sold after the original R&D.
 
-- Repairing anything related to precision mechanics should ring all the warning bells regarding the planned repair time. 
-
-- The Polish PD04 "middleware" is a clever abstraction/generalization of one such repairing process into an actual product. It has been used/considered by some old factories here in Vilnius several times.
-
-- These types of projects could be interesting for graduating E. Eng. students, who would not earn much money, but would surely learn a lot and help people. A student needs to be mildly supervised as there can be a knife/big electric currents involved which present a certain theoretical danger. However, the problem is that these industries are not connected to E. Eng. departments.
-
-- After our repair, the machine worked for about 3 years, last week (May 20th) the hydraulics got broken and repaired, we are going to visit it again on May 26th 2023. TBC...
+- The Polish PD04 "middleware" is a clever transformation of one such repairing process to a commercial product.
 
 ## References
 
