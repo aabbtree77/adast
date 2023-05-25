@@ -151,8 +151,7 @@ The second group of errors add a constant bias to the distance value. For instan
 - The machine is a technological marvel of precision mechanics, hydraulics, large electric current engineering, and the microprocessor logic.
 
 - Repairing a microcontroller unit (MCU) based board will seldom be economically viable. 
-
-- Rewriting a microcontroller program demands rediscovering bits of the original R&D, which takes time, but the benefit of scaling is lost. 
+  Rewriting a microcontroller program demands rediscovering bits of the original R&D, which takes time, but the benefit of scaling is lost. 
   The result is just one repaired device, not many of them sold after the original R&D.
 
 - The Polish PD04 "middleware" is a clever transformation of one such repairing process to a commercial product.
