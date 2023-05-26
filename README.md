@@ -114,7 +114,7 @@ Initially, when turning the machine on, the guillotine's position is unknown and
 
 Since the position of the knife is unknown initially, and we do not know in which direction its only calibrating sensor will be reached, an operator needs to see a rough location of a knife and move it manually so that the knife passes the sensor. This is not as automatic or convenient as it should be, but it is the price we pay for having only a single distance-calibrating sensor.
 
-The code may resync the distance value whenever a knife passes the sensor, but this is commented out. There are options to position the knife so that it first passes the target value by 5cm and then comes back, supposedly to always make the final stop from the forward direction.
+The code may resync the distance value whenever the knife passes the sensor, but these parts are commented out. There are options to position the knife so that it first passes the target value by 5cm and then comes back, supposedly to always make the final stop from the forward direction.
 
 ## Precision 
 
@@ -146,7 +146,7 @@ The second group of errors add a constant bias to the distance value. For instan
 
 - The machine is surprisingly long lasting. We fixed it on February 2020, and it worked without a major hassle until May 2023. Recently, the knife-lifting hydraulics had to be replaced, and we suspect there is also something with the motor brake system that occasionally refuses to move the knife. This problem becomes significant only with very high loads and it is not as bad as it sounds since the impulses are counted correctly and the knife positioning remains precise. It only somewhat annoys the operator as at those "motion refusal" times the operator needs to re-enter the same target distance value again.
 
-- In the nearest future a factory owener plans to do a major maintenance of the motor. If that does not fix the high load problem, we might replace the motor and also add the inverter which could allow a very smooth knife motion, but the code will need to be rewritten. TBC...
+- In the nearest future a factory owener plans to do a major maintenance of the motor. If that does not fix the high load problem, we might replace the motor and also add a so called inverter which could allow a smooth knife motion. The code will have to be rewritten then. TBC...
   
 ## References
 
