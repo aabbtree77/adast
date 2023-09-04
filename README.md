@@ -147,7 +147,7 @@ Another way towards a greater accuracy is to increase the number of impulses. Th
 
 Therefore, we cannot determine MPS with an adequate precision by means of a mm-ruler. We can only verify that the integral micron part is 40mu and see if the decimal part is close to zero, which seems to be the case.
 
-The second group of errors add a constant bias to the distance value. For instance, the sensor position is known only approximately with a millimeter precision of a standard ruler which might introduce a mm/sub-mm bias in the real and displayed knife position. The bias is constant though, so it does not accumulate into the cascaded loss of precision with each knife movement; it can be measured and accounted for, in code. A similar case holds for the potentially imprecise stopping distance values. The only requirement/hope is that they are constant, which is the case only with a single speed and distances larger than a few centimeters. Stopping/braking distance depends on the direction, which is accounted for in the code. 
+The second group of errors add a constant bias to the distance value. For instance, the sensor position is known only approximately with a millimeter precision of a standard ruler which might introduce a mm/sub-mm bias in the real and displayed knife position. The bias is constant though, so it does not accumulate into the cascaded loss of precision with each knife movement; it can be measured and accounted for, in code. A similar case holds for the potentially imprecise stopping distance values. The only requirement/hope is that they are constant, which is the case only with a single speed and distances larger than a few centimeters. A stopping distance depends on the knife movement direction, which is accounted for in the code. 
 
 ## Additional Remarks
 
@@ -159,9 +159,9 @@ The second group of errors add a constant bias to the distance value. For instan
 
 - The Polish PD04 "middleware" is a clever transformation of one such repairing process to a commercial product.
 
-- The machine is surprisingly long lasting. The motor brake system starts to give up under a heavy load, it occasionally refuses to move the knife. A hydraulic gear has once caught some sawdust and jammed the knife lifting mechanism. 
+- The machine is surprisingly long lasting. The motor brake system does start to give up under a heavy load, it occasionally refuses to move the knife. A hydraulic gear had once caught some sawdust and jammed the knife lifting mechanism. 
 
-- The factory owner has bought another similar used Adast guillotine. Its electrical relays occasionally lose contact. Compared to the older model, they are less protected against the mechanical vibrations as they lack any special sockets to keep them tight.
+- The factory owner has bought another similar used Adast guillotine which is a newer model. Its electrical relays occasionally lose contact. Compared to the older model, they are less protected against the mechanical vibrations as they lack any special jackets to keep them tight.
   
 ## References
 
