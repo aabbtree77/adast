@@ -1,7 +1,7 @@
 
 ## Introduction
 
-Adast Maxima MS80 is a paper (paperboard) cutting machine (guillotine) produced in the Czech Republic in the early 1990s, still in operation in Vilnius, Lithuania, 2023.
+Adast Maxima MS80 is a paperboard cutting machine (guillotine) produced in the Czech Republic in the early 1990s. It performed in a factory in Vilnius, Lithuania, until about 2023.
 
 <table>
 <tr>
@@ -14,9 +14,9 @@ Adast Maxima MS80 is a paper (paperboard) cutting machine (guillotine) produced 
 </tr>
 </table>
 
-The repair was executed jointly by me and Saulius Rakauskas in about one week in February 2020. He disassembled the machine, designed a new circuit board, did all the soldering and hardware testing. I wrote the C program for the ATmega16 microcontroller with which we replaced the original Tesla chipset. 
+The repair was executed jointly by me and Saulius Rakauskas in about one week on February 2020. He got the client (the factory owner), disassembled the machine, located the problem, designed a new circuit board, did all the soldering and hardware testing. I only wrote the C program for the ATmega16 microcontroller with which we replaced the original Tesla chipset. 
 
-The machine still does the job even now (May 2023).
+The machine did the job until May 2023 when its mechanics started to break apart.
 
 <table>
 <tr>
@@ -52,9 +52,9 @@ An accident due to the electric current overload in the factory burnt the main c
 </tr>
 </table>
 
-The microcontroller did not survive, so we had to make a new circuit board from what was salvaged. The exact operating regimes and work flows were lost, but the main function, i.e. precise electronic guillotine (knife) positioning and cutting of a paper, was retained.
+The microcontroller did not survive, so we had to make a new circuit board from what was salvaged. The exact operating regimes and work flows were lost, but the main function, the precise electronic guillotine (knife) positioning and cutting, was retained.
 
-Remarkably, there exists a commercial solution/middleware designed to tackle this very specific problem, see i.e. [PD-04][1] which provides a rotary encoder along with the microcontroller based circuit board with the program designed for paper cutting machines. The PD-04 system is expensive. It costs [around 1220 euro (2023)](https://www.en.chip-elektronika.pl/readers-programmers-for-paper-cutters/control-system-pd-04/) for the hardware alone, and it takes two men (mechanics and electrical engineer) and several days to install it. This did not play well with the risks. Nobody knew for sure if PD04 would work on this particular old Adast Maxima, without the need to replace the motor and some unique electrical relays as well.
+Remarkably, there exists a commercial solution/middleware designed to tackle this very specific problem, see i.e. [PD-04][1] which provides a rotary encoder along with the microcontroller based circuit board with the program designed for paper cutting machines. The PD-04 system is somewhat expensive for the replacements in these old machines. It costs [around 1220 euro (2023)](https://www.en.chip-elektronika.pl/readers-programmers-for-paper-cutters/control-system-pd-04/) for the hardware alone, and it takes two men (a mechanician and an electrical engineer) and several days to install it. This did not play well with the risks. Nobody knew for sure if PD04 would work on this particular old Adast Maxima, without the need to replace the motor and relays which would further increase the costs.
 
 ## Adast Maxima MS80
 
@@ -89,17 +89,34 @@ There are a few other modes, but they are not essential. The position is sensed 
 <tr>
 <th> Rotary Encoder </th>
 <th> Deadlock Handling </th>
+<th> Electrical Relays </th>
 </tr>
 <tr>
 <td>
 
-<img src="./images/adastCounterRemoved.jpg"  alt="Adast circuit diagram part 1" width="100%" >
+<img src="./images/adastCounterRemoved.jpg"  alt="Adast Encoder" width="100%" >
 
 </td>
 <td>
 
-<img src="./images/adastDeadlockHandle.jpg"  alt="Adast circuit diagram part 2" width="100%" >
+<img src="./images/adastDeadlockHandle.jpg"  alt="Adast Deadlock Handle" width="100%" >
 
+</td>
+<td>
+
+<img src="./images/adastRelays.jpg"  alt="Adast Electrical Relays" width="100%" >
+
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<th style="text-align:center"> Unsung Heroes, May 2023</th>
+</tr>
+<tr>
+<td>
+<img src="./images/adastPeople.jpg"  alt="Adast Heroes" width="100%" >
 </td>
 </tr>
 </table>
@@ -128,7 +145,7 @@ Suppose that the real value MPS = 40.1mu. Then, 40.1mu x 10000 = 40.1cm. One ten
 
 This example shows that a standard ruler with a millimeter scale and the movement of 10000 impulses can determine only the first decimal part of the micron. Given the millimeter scale, we need to measure longer distances, e.g. 100K-impulse motion leading to, say, 400.4cm would produce MPS = 400.4cm/1e5 = 40.04mu. This is not possible to do, unfortunately, since the maximal guillotine travel is about 80cm. We could use a more precise caliper, but typically its maximal range will only be 4cm and the accuracy of 0.1mm, which gives us nothing.
 
-Another way towards greater accuracy is to increase the impulse numbers. The quadrature encoder outputs two binary signals A and B which produce four states per cycle. These states can be counted, increasing the number of impulses and hence resolution 4x. This is still insufficient, but consider how much the number of impulses matters with the following example. Suppose a guessed MPS=40mu and we measure the distance traveled with only 25 generated impulses. This is about 1mm of travel, which, when measured with a millimeter accuracy, leads to 100% error. Whereas in the example above with 10K impulses, the relative error will be (40.1-40.0)/40 = 0.25%.  
+Another way towards a greater accuracy is to increase the number of impulses. The quadrature encoder outputs two binary signals A and B which produce four states per cycle. These states can be counted, increasing the number of impulses and hence resolution 4x. This is still insufficient, but consider how much the number of impulses matters with the following example. Suppose a guessed MPS=40mu and we measure the distance traveled with only 25 generated impulses. This is about 1mm of travel, which, when measured with a millimeter accuracy, leads to 100% error. Whereas in the example above with 10K impulses, the relative error will be (40.1-40.0)/40 = 0.25%.  
 
 Therefore, we cannot determine MPS with an adequate precision by means of a mm-ruler. We can only verify that the integral micron part is 40mu and see if the decimal part is close to zero, which seems to be the case.
 
@@ -136,7 +153,7 @@ The second group of errors add a constant bias to the distance value. For instan
 
 ## Additional Remarks
 
-- The machine is a technological marvel of precision mechanics, hydraulics, electrical relay engineering, and the microprocessor logic.
+- The machine is a technological marvel of precision mechanics, hydraulics, electrical relay engineering, and the microcontroller logic. It is very heavy and experiences huge mechanical vibrations, yet it has been maintaining mm-precision and continuity throughout long working hours for years.
 
 - Repairing a microcontroller unit (MCU) based board will seldom be economically viable. 
   Rewriting a microcontroller program demands rediscovering bits of the original R&D, which takes time, but the benefit of scaling is lost. 
@@ -144,9 +161,7 @@ The second group of errors add a constant bias to the distance value. For instan
 
 - The Polish PD04 "middleware" is a clever transformation of one such repairing process to a commercial product.
 
-- The machine is surprisingly long lasting. We fixed it on February 2020, and it worked without a major hassle until May 2023. Recently, the knife-lifting hydraulics had to be replaced, and we suspect there is also something with the motor brake system that occasionally refuses to move the knife. This problem becomes significant only with very high loads and it is not as bad as it sounds since the impulses are counted correctly and the knife positioning remains precise. It only somewhat annoys the operator as at those "motion refusal" times the operator needs to re-enter the same target distance value again.
-
-- In the nearest future a factory owener plans to do a major maintenance of the motor. If that does not fix the high load problem, we might replace the motor and also add a so called inverter which could allow a smooth knife motion. The code will have to be rewritten then. TBC...
+- The machine is surprisingly long lasting. We fixed it on February 2020, and it worked without a major hassle until May 2023. The motor brake system now starts to give up as it occasionally refuses to move the knife. Instead of replacing the motor, the factory owner bought another similar used machine.
   
 ## References
 
