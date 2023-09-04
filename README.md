@@ -1,7 +1,7 @@
 
 ## Introduction
 
-Adast Maxima MS80 is a paperboard cutting machine (guillotine) produced in the Czech Republic in the early 1990s. It performed in a factory in Vilnius, Lithuania, until about 2023.
+Adast Maxima MS80 is a paperboard cutting machine (guillotine) produced in the Czech Republic in the early 1990s. Still in operation in Vilnius, September 2023.
 
 <table>
 <tr>
@@ -15,8 +15,6 @@ Adast Maxima MS80 is a paperboard cutting machine (guillotine) produced in the C
 </table>
 
 The repair was executed jointly by me and Saulius Rakauskas in about one week on February 2020. He got the client (the factory owner), disassembled the machine, located the problem, designed a new circuit board, did all the soldering and hardware testing. I only wrote the C program for the ATmega16 microcontroller with which we replaced the original Tesla chipset. 
-
-The machine did the job until May 2023 when its mechanics started to break apart.
 
 <table>
 <tr>
@@ -161,7 +159,9 @@ The second group of errors add a constant bias to the distance value. For instan
 
 - The Polish PD04 "middleware" is a clever transformation of one such repairing process to a commercial product.
 
-- The machine is surprisingly long lasting. We fixed it on February 2020, and it worked without a major hassle until May 2023. The motor brake system now starts to give up as it occasionally refuses to move the knife. Instead of replacing the motor, the factory owner bought another similar used machine.
+- The machine is surprisingly long lasting. The motor brake system starts to give up under a heavy load, it occasionally refuses to move the knife. A hydraulic gear has once caught some sawdust and jammed the knife lifting mechanism. 
+
+- The factory owner has bought another similar used Adast guillotine. Its electrical relays occasionally lose contact. Compared to the older model, they are less protected against the mechanical vibrations as they lack any special sockets to keep them tight.
   
 ## References
 
