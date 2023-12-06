@@ -163,11 +163,30 @@ The second group of errors add a constant bias to the distance value. For instan
 
 - The factory owner has bought another similar used Adast guillotine which is a newer model. Its electrical relays occasionally lose contact. Compared to the older model, they are less protected against the mechanical vibrations as the relays lack special jackets to keep them tight.
 
-## Update, December 2023
+## Update: December 2023
 
-The machine exhibits discontinuities after tens of minutes of work. Once cooled, it works again, initially. It is not clear if this is due to burnt resistors that control some relays, or the motor. The program code is fine.
+The machine exhibits discontinuities after dozens of minutes. Once cooled, it works again, initially. It is not clear if this is due to some burnt resistors that control some relays, or the motor. The program code is fine.
 
 We started working on a new system which will produce a better motor control, hopefully. The system will have a frequency inverter which allows to vary the motor speed, and to remove a shaky brake system.
+
+<table>
+<tr>
+<th style="text-align:center"> Saulius Rakauskas </th>
+<th style="text-align:center"> Custom Circuit + Inverter </th>
+</tr>
+<tr>
+<td>
+
+<img src="./images/adastLateEvening.jpg"  alt="Saulius Rakauskas repairing Adast Maxima MS80. Late Evening" width="100%" >
+
+</td>
+<td>
+
+<img src="./images/adastInverter.jpg"  alt="Installing a Frequency Inverter for a Smooth Motor Control." width="100%" >
+
+</td>
+</tr>
+</table>
 
 It took us two days to test a modified ATmega16/32 program (main_inverter.c vs main_old_way.c) which outputs 1V signal of 1KHz with a variable duty percentage. This signal is then fed to a small custom (R, C, transistor) circuit which outputs the DC signal in the range of 0..60V whose value depends on the duty percentage. The program determines the duty automatically based on how far the knife is located from the specified target. This 0..60V signal controls [the LS M100](https://inverterdrive.com/group/AC-Inverter-Drives-230V/LS-LSLV-0008-M100-1EOFNS/) inverter connected to the motor, and thus adjusts its speed. 
 
@@ -181,11 +200,11 @@ There remain still two problems to solve:
 
 A very slow knife movement is needed to combat the braking distance uncertainties, and we do not want to rely on the external braking. 
   
-The machine works, but we still await some new feedback about its stability. A new motor will be installed, which will reveal whether the problem is in the link "inverter-motor", or it has something to do with relays.
+The machine works, but we still await some feedback about its stability. A new motor will be installed, which will reveal whether the problem is in the link "inverter-motor", or it has something to do with relays.
 
 In the new system, a lot depends on the inverter settings. For better or worse, inverter's acceleration/deceleration time values can impact the knife's braking distance. These precise values need to be stored somewhere in the case of an accidental reboot of the inverter to its factory settings. 
 
-Minor note: "_delay_ms" is not a reliable function with ATmega16/32. Choosing fuse bits to correspond to the internal 8MHz oscillator, and hinting the code with #define F_CPU 8000000UL does not guarantee proper delays. The program works fine until adding the timer1 code in main.c, which makes the program "tick" at 1MHz for some reason. Choosing the default 1MHz fuse bit setup corrects "_delay_ms", but it also makes the timer1 tick 4x slower than expected (based on the new frequency and prescalings). These problems are easy to solve by measuring the ATmega output with an oscilloscope/oscillograph, followed by adjusted prescalings and delays. The patching solves the problem, but it does not reveal the real reason behind these mismatches. 
+Minor note: "_delay_ms" is not a reliable function with ATmega16/32. Choosing fuse bits for the internal 8MHz oscillator, hinting the code with #define F_CPU 8000000UL does not guarantee proper delays. The program works fine until adding the timer1 code in main.c, which makes the program "tick" at 1MHz for some reason. Choosing the default 1MHz fuse bit setup corrects "_delay_ms", but it also makes the timer1 tick 4x slower than expected (based on the new frequency and prescalings). These problems are easy to solve by measuring the ATmega output with an oscilloscope/oscillograph, followed by adjusted prescalings and delays. The patching solves the problem, but it does not reveal the true reason behind these mismatches. 
 
 TBC...  
   
