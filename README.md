@@ -165,25 +165,27 @@ The second group of errors add a constant bias to the distance value. For instan
 
 ## Update, December 2023
 
-The machine exhibits discontinuities after tens of minutes of work. Once cooled, it works well initially, but the knife movement experiences disruptions again after for some tens of minutes. It is not clear if this is due to burnt resistors that control some relays, or the motor. The program is fine.
+The machine exhibits discontinuities after tens of minutes of work. Once cooled, it works again, initially. It is not clear if this is due to burnt resistors that control some relays, or the motor. The program code is fine.
 
-We started working on a new system by adding a frequency inverter which allows to vary the motor speed, and to remove a shaky brake system.
+We started working on a new system which will produce a better motor control, hopefully. The system will have a frequency inverter which allows to vary the motor speed, and to remove a shaky brake system.
 
-In about a week we tested a modified ATmega32 program (main_inverter.c vs main_old_way.c) which outputs 1V signal of 1KHz with a variable duty percentage. This signal is then fed to a small custom (R, C, transistor) circuit which outputs the DC signal in the range of 0..60V whose value depends on the duty percentage. The output controls [the LS M100](https://inverterdrive.com/group/AC-Inverter-Drives-230V/LS-LSLV-0008-M100-1EOFNS/) inverter connected to the motor. 
+It took us two days to test a modified ATmega16/32 program (main_inverter.c vs main_old_way.c) which outputs 1V signal of 1KHz with a variable duty percentage. This signal is then fed to a small custom (R, C, transistor) circuit which outputs the DC signal in the range of 0..60V whose value depends on the duty percentage. The program determines the duty automatically based on how far the knife is located from the specified target. This 0..60V signal controls [the LS M100](https://inverterdrive.com/group/AC-Inverter-Drives-230V/LS-LSLV-0008-M100-1EOFNS/) inverter connected to the motor, and thus adjusts its speed. 
 
-The modified program works, and we even fine-tuned the braking distance parameters as the motor brake is now completely removed (fewer problem links to worry about). There are still two problems to solve:
+The old motor braking system is now completely removed (fewer links to worry about). 
+
+There remain still two problems to solve:
 
 * We cannot make the inverter output frequencies higher than 60Hz (the declared range is 0..400Hz). The motor is not lively enough with a 60Hz input.
 
-* We suspect that the motor has its own problems, or it is not a good match with this frequency inverter. We cannot make it move the knife fast (not a big deal), and we cannot make it move the knife very slowly as the motor simply halts, but only when moving in one specific direction. 
+* We suspect that the old motor has its own problems, or it is not a good match with this frequency inverter. We cannot make it move the knife fast (not a big deal), and we cannot make it move the knife very slowly as the motor occasionally halts, but only when moving in one specific direction. 
 
-A very slow knife movement is needed to combat the braking distance, and we do not want to rely on the external braking. 
+A very slow knife movement is needed to combat the braking distance uncertainties, and we do not want to rely on the external braking. 
   
-The machine works, but we still await some new feedback and a new motor which will reveal whether the problem is in the link "inverter-motor", or it has something to do with relays.
+The machine works, but we still await some new feedback about its stability. A new motor will be installed, which will reveal whether the problem is in the link "inverter-motor", or it has something to do with relays.
 
-In the new system, a lot depends on the inverter settings. For better or worse, inverter's acceleration/deceleration times can impact the knife's braking distance. These precise values need to be stored somewhere in the case of accidental reboot to the factory settings. 
+In the new system, a lot depends on the inverter settings. For better or worse, inverter's acceleration/deceleration time values can impact the knife's braking distance. These precise values need to be stored somewhere in the case of an accidental reboot of the inverter to its factory settings. 
 
-Minor note: "_delay_ms" is not a reliable function with ATmega16/32. Choosing fuse bits to correspond to the internal 8MHz oscillator, and specifying #define F_CPU 8000000UL does not guarantee proper delays. The program works fine until adding the timer1 code in main.c, which makes the program "tick" at 1MHz for some reason. Choosing the default 1MHz setup corrected the "_delay_ms", but made the timer1 tick 4x slower than expected (based on the new frequency and prescalings). These problems are easy to solve by simply measuring the ATmega output with an oscilloscope/oscillograph, followed by adjusted prescalings. This patching solves the problem, but it does not reveal the real reason behind these mismatches. 
+Minor note: "_delay_ms" is not a reliable function with ATmega16/32. Choosing fuse bits to correspond to the internal 8MHz oscillator, and hinting the code with #define F_CPU 8000000UL does not guarantee proper delays. The program works fine until adding the timer1 code in main.c, which makes the program "tick" at 1MHz for some reason. Choosing the default 1MHz fuse bit setup corrects "_delay_ms", but it also makes the timer1 tick 4x slower than expected (based on the new frequency and prescalings). These problems are easy to solve by measuring the ATmega output with an oscilloscope/oscillograph, followed by adjusted prescalings and delays. The patching solves the problem, but it does not reveal the real reason behind these mismatches. 
 
 TBC...  
   
