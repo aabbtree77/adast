@@ -1,4 +1,4 @@
-/*** atmega16/32, R. G., December 1st, 2023 ***/
+/*** atmega16/32, R. G., February 8, 2024 ***/
 
 #ifndef F_CPU
 #define F_CPU 8000000UL
@@ -71,9 +71,9 @@
 //int16_t is in [−32768, +32767]
 //int32_t is in [−2147483648, +2147483647]
 
-const int32_t P_MAX_MU = ((int32_t)800000);
+const int32_t P_MAX_MU = ((int32_t)810000); //810mm, all these dist vals are in microns
 const int32_t P_MIN_MU = ((int32_t)30000);
-const int32_t P_ST_MU = ((int32_t)223000);
+const int32_t P_ST_MU = ((int32_t)222400);
 
 volatile int32_t BREAK_DIST_FORW_MU = 2400;
 volatile int32_t BREAK_DIST_BACK_MU = 100;

@@ -1,4 +1,4 @@
-# R.G. April 30, 2023
+# R.G. Feb 8, 2024
 
 # fusebits: Internal 8MHz with 64ms startup time.
 # disable JTAG interface as it overlaps with PORTC

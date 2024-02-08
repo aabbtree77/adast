@@ -1,7 +1,7 @@
 
 ## Introduction
 
-Adast Maxima MS80 is a paperboard cutting machine (guillotine) produced in the Czech Republic in the early 1990s. Still in operation in Vilnius, September 2023.
+Adast Maxima MS80 is a paperboard cutting machine (guillotine) produced in the Czech Republic in the early 1990s. Still in operation in Vilnius, February 2024.
 
 <table>
 <tr>
@@ -14,7 +14,7 @@ Adast Maxima MS80 is a paperboard cutting machine (guillotine) produced in the C
 </tr>
 </table>
 
-The repair was executed jointly by me and Saulius Rakauskas in about one week on February 2020. He got the client (the factory owner), disassembled the machine, located the problem, designed a new circuit board, did all the soldering and hardware testing. I only wrote the C program for the ATmega16 microcontroller with which we replaced the original Tesla chipset. 
+The repair was executed jointly by me and Saulius Rakauskas in about one week on February 2020. He got the client (the factory owner), disassembled the machine, located the problem, designed a new circuit board, did all the soldering and hardware testing. I only wrote the C program for the ATmega16/32 microcontroller with which we replaced the original Tesla chipset. 
 
 <table>
 <tr>
@@ -110,7 +110,7 @@ There are a few other modes, but they are not essential. The position is sensed 
 
 <table>
 <tr>
-<th style="text-align:center"> Unsung Heroes, May 2023</th>
+<th style="text-align:center"> Unsung Heroes: Saulius and Igor, May 2023</th>
 </tr>
 <tr>
 <td>
@@ -149,7 +149,7 @@ Therefore, we cannot determine MPS with an adequate precision by means of a mm-r
 
 The second group of errors add a constant bias to the distance value. For instance, the sensor position is known only approximately with a millimeter precision of a standard ruler which might introduce a mm/sub-mm bias in the real and displayed knife position. The bias is constant though, so it does not accumulate into the cascaded loss of precision with each knife movement; it can be measured and accounted for, in code. A similar case holds for the potentially imprecise stopping distance values. The only requirement/hope is that they are constant, which is the case only with a single speed and distances larger than a few centimeters. A stopping distance depends on the knife movement direction, which is accounted for in the code. 
 
-## Additional Remarks
+## General Observations
 
 - The machine is a technological marvel of precision mechanics, hydraulics, electrical relay engineering, and the microcontroller logic. It is very heavy and experiences huge mechanical vibrations, yet it has been maintaining mm-precision and continuity throughout long working hours for years.
 
@@ -167,7 +167,7 @@ The second group of errors add a constant bias to the distance value. For instan
 
 The knife motion exhibits discontinuities after dozens of minutes. Once the machine is cooled, it works again, initially. It is not clear if this is due to some burnt resistors that control some relays, or the motor.
 
-We started working on a new system. It will produce a better motor control with a frequency inverter which will allow variable motor speed.
+We have begun work on a new system that will produce better motor control with a frequency inverter, enabling variable motor speed.
 
 <table>
 <tr>
@@ -188,26 +188,100 @@ We started working on a new system. It will produce a better motor control with 
 </tr>
 </table>
 
-It took us two days to test a modified ATmega16/32 program (main_inverter.c vs main_old_way.c). It now outputs 1V signal of 1KHz with a variable duty percentage. This signal is then fed to a custom (R, C, transistor) circuit which outputs the DC signal in the range of 0..60V whose value depends on the duty percentage. The program determines the duty automatically based on how far the knife is located from the specified target. This 0..60V signal controls [the LS M100](https://inverterdrive.com/group/AC-Inverter-Drives-230V/LS-LSLV-0008-M100-1EOFNS/) inverter connected to the motor, and thus adjusts its speed. 
+It took us two days to test a modified ATmega16/32 program (main_inverter.c vs main_old_way.c). It now outputs 1V signal of 1KHz with a variable duty percentage. This signal is then fed to a custom (R, C, transistor) circuit which outputs the DC signal in the range of 0..60V whose value depends on the duty percentage. The program determines the duty automatically based on how far the knife is located from the specified target. This 0..60V signal controls [the LS M100](https://inverterdrive.com/group/AC-Inverter-Drives-230V/LS-LSLV-0008-M100-1EOFNS/) inverter connected to the motor, and thus adjusts its speed. The inverter output is 220V, but its frequency varies depending on the 0..60V input signal.
 
-The old motor braking system is now disabled. Fewer links to worry about, but combatting stopping distance now demands a tiny motor speed before the stop.
+The old motor braking system is now completely disabled. The stopping distances are now bigger, but we reduce/control them with a variable motor speed. Initially, the duty percentage is 80%, and the motor runs fast enough. We reduce it to 20% duty when 5cm are left to the target, and the duty is 10% for the last centimeter.
 
-We suspect that the old motor has problems: 
+The two braking distances become more like "braking distance-related parameters" as they are coupled with a now much shorter delay between the change of the diretion at a 5cm overrreach. We determine the values experimentally:
 
-* We cannot make it move the knife fast in the 220V regime (the 380V option has been disabled in the past). 
+```
+volatile int32_t BREAK_DIST_FORW_MU = 2400;
+volatile int32_t BREAK_DIST_BACK_MU = 100;
+```
 
-* We cannot make it move the knife very slowly as the motor occasionally halts, esp. under a load when the moving iron plate needs to push the paper stack.
+Variable motor speed, the two parameters above, and "_delay_ms(50);" (our ATmega code lies here as it is 400ms-delay in reality) in the following code section provide a practical sub-mm precision:
 
-A very slow knife movement is needed to combat the braking distance uncertainties, and we do not want to rely on the external braking during these tests. 
+```
+void move_to_target_and_stop(int32_t target_val) {
+
+    int32_t diff_mu;
+    diff_mu = target_val - P_MU;
+    
+    //100mu = 0.1 mm is the smallest allowed target dist difference
+    if ( (diff_mu < -90) || (diff_mu > 90) ) {
+        if (diff_mu > 0) {
+            if( (P_MAX_MU - target_val) > OFFSET_MU ) {
+                submove_to_target(target_val + OFFSET_MU - BREAK_DIST_BACK_MU);
+                _delay_ms(50);
+                submove_to_target(target_val + BREAK_DIST_FORW_MU);          
+            } else {
+                submove_to_target(target_val - BREAK_DIST_BACK_MU);
+            }        
+        } else {
+            submove_to_target(target_val + BREAK_DIST_FORW_MU);
+        }
+    }
+    //Otherwise exit as diff_mu is too small.
+}    
+```
+
+It is important to note that we have reached an acceptable precision for the knife positioning in the mode when it passes the target with a 5cm overreach and then goes back. It is still decent with the direct positioning when moving backwards, but not for small repeated displacements of few centimeters. We were drastically saving time on the experiments that try to combat braking distances and were content with the final practical result. 
+
+To be more precise and exhaustive, one could make these three parameters depend on the target distance and whether the knife is positioned directly, or with an overreach. This, however, would demand weeks of experiments, the results of which might be nullified if the new motor is installed sometime in the future.
+
+Oddly, the new LS M100 inverter is not an ideal match for the old motor, but it does the job:
+
+* We cannot make it move the knife very fast in the 220V regime (the 380V option has been disabled in the past). This can be ignored.
+
+* At very low speeds (when the knife approaches the target), the motor occasionally halts, esp. under a load when the moving iron plate needs to push/adjust the paper stack.
+
+A very slow knife movement is needed to combat the braking distance uncertainties, esp. after the removal of the braking system.
   
 A new motor will be installed, which will reveal whether the problem is in the link "inverter-motor", or it has something to do with relays.
 
-In the new system, a lot depends on the inverter settings. For better or worse, inverter's acceleration/deceleration time values can impact the knife's braking distance. These precise values need to be stored somewhere in the case of an accidental reboot of the inverter to its factory settings. 
+The new system depends on the inverter settings. Any non-factory value needs to be documented and stored somewhere in the case of an accidental reboot of the inverter.
 
-A minor note: "_delay_ms" is not a reliable function with ATmega16/32. Choosing fuse bits for the internal 8MHz oscillator, hinting the code with #define F_CPU 8000000UL does not guarantee proper delays. The program works fine until adding the timer1 code in main.c, which makes the program "tick" at 1MHz for some reason. Choosing the default 1MHz fuse bit setup corrects "_delay_ms", but it also makes the timer1 tick 4x slower than expected (based on the new frequency and prescalings). These problems are easy to solve by measuring the ATmega output with an oscilloscope/oscillograph, followed by adjusted prescalings and delays. The patching solves the problem, but it does not reveal the true reason behind these mismatches. 
+A minor note: "_delay_ms" is not a reliable function with ATmega16/32. Choosing fuse bits for the internal 8MHz oscillator, hinting the code with #define F_CPU 8000000UL does not guarantee proper delays. The program works fine until adding the timer1 code in main.c, which makes the program "tick" at 1MHz for some reason. 
 
-TBC...  
-  
+On the other hand, the default 1MHz fuse bit setup corrects "_delay_ms", but it also makes the timer1 tick 4x slower than expected (based on the new frequency and prescalings). These problems are easy to solve by measuring the ATmega output with an oscilloscope/oscillograph, followed by adjusted prescalings and delays. The patching solves the problem, but it does not reveal the true reason behind these mismatches. It also obfuscates the code (the actual values are 8x bigger than the ones shown in the code).
+
+## Update: February 2024
+
+We have managed to get the new (inverter-based) system work without installing a new motor, although it would be a good idea to install it in the future as the old motor somewhat lacks power in the combo with the LS M100 inverter. 
+
+Saulius found a way to increase the inverter output voltage from 220V to 260V by adjusting these values in the ioV setting (LS M100). The old motor is now more lively.
+
+Amusingly, Igor found a mechanical way to adjust distance values (directly, without code). In the photo below, on the left, you can see a little "black cube" positioned between the impulse counter and the yellow disk. Rotating the cube enables the counting of impulses without moving the knife. 
+
+The edge detection and motion prevention sensor wirings got mingled in the previous work in December 2023. On the right, there is a panel with wires that had to be traced to the sensors, and then switched back.
+
+The maximal physical knife distance is around 82cm, but the maximal precise positioning distance is now set to 75cm. The edge sensors reduce 82cm a bit, followed by a 5cm overreach motion needed for the precise positioning. This adjustment was also needed:
+
+```
+const int32_t P_MAX_MU = ((int32_t)810000);
+```
+
+(Previously, 800000).
+
+Oddly, after the removal of the brake system, we had to adjust the distance sensor position to
+
+```
+const int32_t P_ST_MU = ((int32_t)222400);
+```
+
+The old value was 222.5mm at first, then 230mm, and now it is 222.4mm.
+
+<table>
+<tr>
+<th style="text-align:center">Adast Maxima MS80: The Back Side, February 2024</th>
+</tr>
+<tr>
+<td>
+<img src="./images/adastBackSide.jpg"  alt="Adast Maxima MS80 Back Side" width="100%" >
+</td>
+</tr>
+</table> 
+
 ## References
 
 - [PD-04][1]
