@@ -188,11 +188,11 @@ We have begun work on a new system that will produce better motor control with a
 </tr>
 </table>
 
-It took us two days to test a modified ATmega16/32 program (main_inverter.c vs main_old_way.c). It now outputs 1V signal of 1KHz with a variable duty percentage. This signal is then fed to a custom (R, C, transistor) circuit which outputs the DC signal in the range of 0..60V whose value depends on the duty percentage. The program determines the duty automatically based on how far the knife is located from the specified target. This 0..60V signal controls [the LS M100](https://inverterdrive.com/group/AC-Inverter-Drives-230V/LS-LSLV-0008-M100-1EOFNS/) inverter connected to the motor, and thus adjusts its speed. The inverter output is 220V, but its frequency varies depending on the 0..60V input signal.
+It took us two days to test a modified ATmega16/32 program (the new main.c vs main_no_inverter.c). It now outputs 1V signal of 1KHz with a variable duty percentage. This signal is then fed to a custom (R, C, transistor) circuit which outputs the DC signal in the range of 0..60V whose value depends on the duty percentage. The program determines the duty automatically based on how far the knife is located from the specified target. This 0..60V signal controls [the LS M100 inverter](https://inverterdrive.com/group/AC-Inverter-Drives-230V/LS-LSLV-0008-M100-1EOFNS/) connected to the motor, and thus adjusts its speed. The inverter output is 220V, but its frequency varies depending on the 0..60V input signal.
 
-The old motor braking system is now completely disabled. The stopping distances are now bigger, but we reduce/control them with a variable motor speed. Initially, the duty percentage is 80%, and the motor runs fast enough. We reduce it to 20% duty when 5cm are left to the target, and the duty is 10% for the last centimeter.
+The old motor braking system is now completely disabled. The stopping distances are now bigger, but we combat them with a variable motor speed. Initially, the duty percentage is 80%, and the motor runs fast enough. We reduce it to 20% duty when 5cm are left to the target, and the duty becomes 10% for the last centimeter.
 
-The two braking distances become more like "braking distance-related parameters" as they are coupled with a now much shorter delay between the change of the diretion at a 5cm overrreach. We determine the values experimentally:
+The two braking distances become more like "braking distance-related parameters" as they are coupled with a now much shorter delay between the change of the direction at the 5cm overrreach. We determine the values experimentally:
 
 ```
 volatile int32_t BREAK_DIST_FORW_MU = 2400;
@@ -225,9 +225,9 @@ void move_to_target_and_stop(int32_t target_val) {
 }    
 ```
 
-It is important to note that we have reached an acceptable precision for the knife positioning in the mode when it passes the target with a 5cm overreach and then goes back. It is still decent with the direct positioning when moving backwards, but not for small repeated displacements of few centimeters. We were drastically saving time on the experiments that try to combat braking distances and were content with the final practical result. 
+It is important to note that we have reached an acceptable precision for the knife positioning in the mode when it passes the target with a 5cm overreach and then goes back. It is still decent with the direct positioning when moving backwards, but not for small repeated displacements of few centimeters, or pure moving forward without an overreach. We were drastically saving time on the experiments that try to combat braking distances and were content with the final practical result. 
 
-To be more precise and exhaustive, one could make these three parameters depend on the target distance and whether the knife is positioned directly, or with an overreach. This, however, would demand weeks of experiments, the results of which might be nullified if the new motor is installed sometime in the future.
+To be more precise and exhaustive, one could make these three parameters depend on the target distance (big, medium, small, at least), and whether the knife is positioned directly, or with an overreach. This, however, would demand weeks of experiments, the results of which might be nullified if the new motor is installed sometime in the future.
 
 Oddly, the new LS M100 inverter is not an ideal match for the old motor, but it does the job:
 
@@ -235,9 +235,7 @@ Oddly, the new LS M100 inverter is not an ideal match for the old motor, but it 
 
 * At very low speeds (when the knife approaches the target), the motor occasionally halts, esp. under a load when the moving iron plate needs to push/adjust the paper stack.
 
-A very slow knife movement is needed to combat the braking distance uncertainties, esp. after the removal of the braking system.
-  
-A new motor will be installed, which will reveal whether the problem is in the link "inverter-motor", or it has something to do with relays.
+**A very slow knife movement is needed to combat the braking distance uncertainties, esp. after removal of the braking system. The major new pain point is getting enough motor power at these very slow speeds. A new motor needs to be installed.**
 
 The new system depends on the inverter settings. Any non-factory value needs to be documented and stored somewhere in the case of an accidental reboot of the inverter.
 
@@ -247,7 +245,7 @@ On the other hand, the default 1MHz fuse bit setup corrects "_delay_ms", but it 
 
 ## Update: February 2024
 
-We have managed to get the new (inverter-based) system work without installing a new motor, although it would be a good idea to install it in the future as the old motor somewhat lacks power in the combo with the LS M100 inverter. 
+**We have managed to get the new (inverter-based) system work without installing a new motor, although it would be a good idea to install it in the future as the old motor somewhat lacks power in the combo with the LS M100 inverter.** 
 
 Saulius found a way to increase the inverter output voltage from 220V to 260V by adjusting these values in the ioV setting (LS M100). The old motor is now more lively.
 
@@ -261,7 +259,7 @@ The maximal physical knife distance is around 82cm, but the maximal precise posi
 const int32_t P_MAX_MU = ((int32_t)810000);
 ```
 
-(Previously, 800000).
+Previously, it was 800000.
 
 Oddly, after the removal of the brake system, we had to adjust the distance sensor position to
 
@@ -269,7 +267,11 @@ Oddly, after the removal of the brake system, we had to adjust the distance sens
 const int32_t P_ST_MU = ((int32_t)222400);
 ```
 
-The old value was 222.5mm at first, then 230mm, and now it is 222.4mm.
+The old value was 222.5mm at first, then 230mm, and now it is 222.4mm. 
+
+Igor also showed us that the experiments needed to be done with the actual paper cutting. It is not enough to measure the knife position with a ruler, which immensely slows down the process.
+
+Let us see how long it takes this time before some other problem emerges. The amazing thing is, the machine still works, and the printing factory uses it rather heavily.
 
 <table>
 <tr>
